@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Name | Cyber Developer</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Typed.js -->
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- MATRIX CANVAS -->
+<canvas id="matrix"></canvas>
+
+<header>
+    <div class="logo">VAMSHI<span>AN</span></div>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#education">Education</a>
+        <a href="#hobbies">Hobbies</a>
+        <a href="#achievements">Achievements</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+    </nav>
+    </div>
+</header>
+
+<section id="home" class="glass home">
+    <h1>Hi, I'm <span>Vamshi</span></h1>
+    <h2><span class="typing"></span></h2>
+    <a href="#contact" class="btn">Contact Me</a>
+</section>
+
+<section id="about" class="glass">
+    <h2>About Me</h2>
+    <p>
+        Motivated and detail-oriented Computer Science student
+         with strong foundations in Python, HTML, CSS, 
+        and JavaScript. Passionate about full-stack development 
+        and machine learning. Experienced in developing small projects like stock 
+        price prediction and web applications. Eager to learn 
+        new technologies and contribute to innovative software solutions.    </p>
+</section>
+<section id="education" class="glass">
+    <h2>Education</h2>
+
+    <div class="timeline">
+
+        <div class="timeline-item">
+            <h3>Secondary School Leaving Certificate (SSLC)</h3>
+            <span>Academic Performance Level: 93.12%</span>
+            <p>Completed SSLC with a strong academic foundation in Mathematics, 
+                Science, and Social Studies, developing analytical thinking and 
+                problem-solving skills.</p>
+        </div>
+
+        <div class="timeline-item">
+            <h3>Pre-University Course (Commerce)</h3>
+            <span>Academic Focus Level: 91.5%</span>
+            <p>Completed PUC with a focus on Accountancy, 
+                Business Studies, and Economics, building 
+                a strong foundation in finance and business concepts.</p>
+        </div>
+
+        <div class="timeline-item">
+            <h3>Bachelor’s Degree in BCA</h3>
+            <span>Professional Readiness Level: 9.12 CGPA</span>
+            <p>Studying core concepts of Programming, 
+                Web Development, Databases, and Software Development with practical project experience.</p>
+        </div>
+
+    </div>
+</section>
+<section id="hobbies" class="glass">
+    <h2>Hobbies & Interests</h2>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>✍ Writing Stories</h3>
+            <p>Creating fantasy, emotional and imaginative stories that reflect deep thinking and creativity.</p>
+        </div>
+
+        <div class="card">
+            <h3>🎧 Listening to Music</h3>
+            <p>Music helps me relax, improve focus, and spark creativity while coding and writing.</p>
+        </div>
+
+        <div class="card">
+            <h3>♟ Playing Chess</h3>
+            <p>Chess improves my strategic thinking, patience, and problem-solving abilities.</p>
+        </div>
+
+    </div>
+</section>
+
+<section id="achievements" class="glass">
+    <h2>Achievements</h2>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>Login 2k25 Debugging 1st prize</h3>
+        </div>
+
+        <div class="card">
+            <h3>Login 2k25 Reverse Coding 1st Prize</h3>
+        </div>
+
+        <div class="card">
+            <h3>Code C Program Participation Certificate</h3>
+        </div>
+
+        <div class="card">
+            <h3>English Literature Club Member Certificate</h3>
+        </div>
+
+        <div class="card">
+            <h3>Infosys Workshop Certificate</h3>
+        </div>
+    </div>
+</section>
+
+<section id="projects" class="glass">
+    <h2>HTML Projects</h2>
+
+    <div class="cards">
+        <div class="card" onclick="window.location.href='https://vamshian.github.io/Tic-Tac-Toe/'">
+            <h3>TIC TAC TOE</h3>
+            <p>A simple game of Tic Tac Toe.</p>
+        </div>
+
+        <div class="card" onclick="window.location.href='https://vamshian.github.io/Typing-Test/'">
+            <h3>Typing Test</h3>
+            <p>It is a game where you can improve typing test.</p>
+        </div>
+
+        <div class="card" onclick="window.location.href='https://vamshian.github.io/Calculator/'">
+            <h3>Calculator</h3>
+            <p>Calculator for simple Calcylation.</p>
+        </div>
+    </div>
+</section>
+
+<section id="contact" class="glass">
+    <h2>Contact Me</h2>
+
+    <!-- CONTACT DETAILS -->
+    <div class="contact-info">
+
+        <p><i class="fas fa-phone"></i> +91 9035124146</p>
+
+        <p><i class="fas fa-envelope"></i> vamshian785@email.com</p>
+
+        <p>
+            <i class="fab fa-github"></i>
+            <a href="https://github.com/vamshian" target="_blank">
+                github.com/vamshian
+            </a>
+        </p>
+
+        <p>
+            <i class="fab fa-linkedin"></i>
+            <a href="https://linkedin.com/in/yourusername" target="_blank">
+                linkedin.com/in/yourusername
+            </a>
+        </p>
+
+    </div>
+
+
+
+    <p id="status"></p>
+</section>
+
+<footer>
+    © 2026 VAMSHI | Developer
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
