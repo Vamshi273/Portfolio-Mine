@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>vamshi.dev — portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg0:#000000;--bg1:#0d0d0d;--bg2:#111111;--bg3:#161616;--bg4:#1c1c1c;
+  --line:#222222;--green:#4ade80;--green-dim:#166534;--blue:#60a5fa;
+  --yellow:#fbbf24;--red:#f87171;--purple:#a78bfa;--cyan:#22d3ee;
+  --orange:#fb923c;--comment:#3f3f3f;--muted:#555555;--mid:#888888;
+  --text:#cccccc;--bright:#eeeeee;--sidebar-w:220px;
+  --mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg0);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.6;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);pointer-events:none;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg0);}
+::-webkit-scrollbar-thumb{background:var(--comment);}
+::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+
+.layout{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--bg1);border-right:1px solid var(--line);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100;overflow:hidden;}
+.sidebar-top{padding:14px 16px 10px;border-bottom:1px solid var(--line);}
+.sidebar-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+.sidebar-sub{font-size:10px;color:var(--comment);margin-top:2px;}
+.file-tree{flex:1;overflow-y:auto;padding:8px 0;}
+.tree-folder{display:flex;align-items:center;gap:6px;padding:4px 12px;font-size:11px;color:var(--muted);letter-spacing:.05em;user-select:none;}
+.tree-folder .ico{color:var(--yellow);font-style:normal;}
+.file-item{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 26px;font-size:12px;color:var(--mid);cursor:pointer;border-left:2px solid transparent;transition:background .15s,color .15s,border-color .15s;text-decoration:none;}
+.file-item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.file-item:hover{background:var(--bg3);color:var(--text);}
+.file-item.active{background:var(--bg4);color:var(--bright);border-left-color:var(--green);}
+.file-item .ext{color:var(--comment);font-size:11px;}
+.sidebar-bottom{border-top:1px solid var(--line);padding:10px 12px;}
+.git-status{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--comment);}
+.git-branch{color:var(--purple);}
+.git-dot{color:var(--green);}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;}
+
+/* TABS */
+.topbar{position:sticky;top:0;background:var(--bg1);border-bottom:1px solid var(--line);display:flex;align-items:stretch;z-index:90;height:36px;overflow-x:auto;}
+.topbar::-webkit-scrollbar{height:0;}
+.tab{display:flex;align-items:center;gap:6px;padding:0 14px;font-size:11px;color:var(--muted);border-right:1px solid var(--line);white-space:nowrap;cursor:pointer;transition:background .15s,color .15s;text-decoration:none;border-bottom:2px solid transparent;}
+.tab:hover{background:var(--bg3);color:var(--text);}
+.tab.active{background:var(--bg0);color:var(--bright);border-bottom-color:var(--green);}
+.tab .tab-dot{width:5px;height:5px;border-radius:50%;background:var(--orange);}
+.tab-lang{font-size:10px;color:var(--comment);}
+
+/* SECTIONS */
+section{min-height:100vh;padding:0;position:relative;}
+.code-header{background:var(--bg1);border-bottom:1px solid var(--line);padding:8px 24px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--comment);position:sticky;top:36px;z-index:80;}
+.code-header::before{content:'›';color:var(--green);font-size:14px;}
+.code-header .fn{color:var(--blue);}
+.section-body{display:flex;}
+.line-nums{width:52px;flex-shrink:0;background:var(--bg0);border-right:1px solid var(--line);padding:32px 0;text-align:right;user-select:none;}
+.ln{display:block;padding:0 10px 0 0;font-size:12px;line-height:26px;color:var(--comment);}
+.code-area{flex:1;padding:32px 40px;min-width:0;}
+
+/* HERO */
+#home .code-area{display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 72px);}
+.terminal-window{background:var(--bg1);border:1px solid var(--line);border-radius:6px;overflow:hidden;max-width:680px;margin-bottom:3rem;box-shadow:0 24px 80px rgba(0,0,0,.8);}
+.term-titlebar{background:var(--bg3);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);}
+.term-btn{width:10px;height:10px;border-radius:50%;}
+.term-btn.r{background:#ff5f57;}.term-btn.y{background:#febc2e;}.term-btn.g{background:#28c840;}
+.term-name{font-size:11px;color:var(--muted);margin-left:6px;}
+.term-body{padding:18px 20px;font-size:13px;line-height:1.9;}
+.tc{color:var(--cyan);}.tb{color:var(--blue);}.tg{color:var(--green);}.to{color:var(--mid);}.ty{color:var(--yellow);}.tor{color:var(--orange);}.tp{color:var(--purple);}
+.tcur{display:inline-block;width:8px;height:14px;background:var(--green);vertical-align:text-bottom;animation:blink .9s step-end infinite;}
+@keyframes blink{50%{opacity:0;}}
+.hero-tagline{font-size:clamp(1.6rem,4vw,2.8rem);font-weight:700;line-height:1.2;color:var(--bright);margin-bottom:.6rem;}
+.hero-tagline .hg{color:var(--green);}.hero-tagline .hb{color:var(--blue);}
+.hero-sub{font-size:13px;color:var(--mid);margin-bottom:2rem;max-width:480px;}
+.cmt{color:var(--comment);font-style:italic;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-c{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;font-family:var(--mono);font-size:12px;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:all .2s;}
+.btn-p{background:var(--green);color:var(--bg0);border:1px solid var(--green);}
+.btn-p:hover{background:transparent;color:var(--green);}
+.btn-g{background:transparent;color:var(--text);border:1px solid var(--line);}
+.btn-g:hover{border-color:var(--muted);color:var(--bright);}
+
+/* CODE SYNTAX */
+.code-block{max-width:760px;}
+.code-line{display:flex;gap:0;line-height:26px;}
+.kw{color:var(--purple);}.kw2{color:var(--blue);}.fn{color:var(--yellow);}.str{color:var(--green);}.str2{color:var(--orange);}.num{color:var(--cyan);}.op{color:var(--mid);}
+.i1{padding-left:20px;}.i2{padding-left:40px;}.i3{padding-left:60px;}
+
+/* SKILLS TABLE */
+.skills-table{width:100%;max-width:800px;border-collapse:collapse;}
+.skills-table tr{border-bottom:1px solid var(--line);}
+.skills-table tr:hover td{background:var(--bg2);}
+.skills-table td{padding:10px 16px;font-size:12px;transition:background .15s;}
+.td-num{color:var(--comment);width:40px;text-align:right;padding-right:20px;}
+.td-name{color:var(--yellow);width:160px;}
+.td-type{color:var(--purple);width:140px;}
+.level-bar{display:flex;align-items:center;gap:12px;}
+.bar-track{flex:1;height:3px;background:var(--bg4);position:relative;overflow:hidden;}
+.bar-fill{position:absolute;left:0;top:0;bottom:0;background:var(--green);width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.bar-pct{font-size:10px;color:var(--comment);width:30px;text-align:right;}
+
+/* EDUCATION */
+.edu-cards{display:flex;flex-direction:column;gap:0;max-width:760px;}
+.edu-card{border:1px solid var(--line);border-top:none;padding:20px 24px;background:var(--bg1);transition:background .2s;position:relative;}
+.edu-card:first-child{border-top:1px solid var(--line);}
+.edu-card::before{content:attr(data-num);position:absolute;top:20px;right:20px;font-size:10px;color:var(--comment);letter-spacing:.05em;}
+.edu-card:hover{background:var(--bg2);}
+.edu-tag{display:inline-block;font-size:10px;padding:2px 8px;background:var(--green-dim);color:var(--green);margin-bottom:8px;letter-spacing:.05em;}
+.edu-deg{font-size:14px;font-weight:700;color:var(--bright);margin-bottom:4px;}
+.edu-score{font-size:12px;color:var(--yellow);margin-bottom:8px;}
+.edu-desc{font-size:11px;color:var(--muted);line-height:1.7;}
+
+/* HOBBIES */
+.hobby-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);max-width:760px;}
+.hobby-tile{background:var(--bg1);padding:24px 20px;transition:background .2s;}
+.hobby-tile:hover{background:var(--bg3);}
+.hobby-num{font-size:10px;color:var(--comment);margin-bottom:12px;}
+.hobby-ico{font-size:1.8rem;margin-bottom:10px;}
+.hobby-t{font-size:13px;font-weight:700;color:var(--bright);margin-bottom:6px;}
+.hobby-d{font-size:11px;color:var(--muted);line-height:1.7;}
+
+/* ACHIEVEMENTS */
+.ach-list{max-width:720px;}
+.ach-item{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--line);}
+.ach-item:first-child{border-top:1px solid var(--line);}
+.ach-idx{width:50px;flex-shrink:0;padding:14px 0;color:var(--comment);font-size:11px;border-right:1px solid var(--line);text-align:center;}
+.ach-body{flex:1;padding:14px 20px;}
+.ach-label{font-size:10px;letter-spacing:.1em;color:var(--green);margin-bottom:3px;}
+.ach-name{font-size:13px;color:var(--bright);font-weight:500;}
+.ach-meta{font-size:10px;color:var(--muted);margin-top:2px;}
+.ach-badge{padding:14px 16px;font-size:18px;display:flex;align-items:center;}
+
+/* PROJECTS */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);}
+.proj-card{background:var(--bg1);transition:background .2s;position:relative;overflow:hidden;}
+.proj-card:hover{background:var(--bg2);}
+.proj-card:hover .proj-bar{width:100%;}
+.proj-bar{height:2px;background:linear-gradient(90deg,var(--green),var(--cyan));width:0;transition:width .4s;}
+.proj-inner{padding:20px 22px 22px;}
+.proj-file{font-size:10px;color:var(--comment);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.proj-file-ico{color:var(--yellow);}
+.proj-name{font-size:14px;font-weight:700;color:var(--bright);margin-bottom:8px;}
+.proj-desc{font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:16px;}
+.proj-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.ptag{font-size:10px;padding:2px 8px;border:1px solid var(--line);color:var(--muted);}
+.ptag.py{border-color:var(--blue);color:var(--blue);}
+.ptag.ml{border-color:var(--purple);color:var(--purple);}
+.ptag.js{border-color:var(--yellow);color:var(--yellow);}
+.ptag.cs{border-color:var(--cyan);color:var(--cyan);}
+.ptag.dj{border-color:var(--green);color:var(--green);}
+
+/* CONTACT */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;max-width:840px;}
+.contact-links{display:flex;flex-direction:column;gap:0;}
+.c-link{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--text);transition:background .15s;}
+.c-link:first-child{border-top:1px solid var(--line);}
+.c-link:hover{background:var(--bg3);color:var(--bright);}
+.c-ico{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-right:1px solid var(--line);font-size:1rem;flex-shrink:0;}
+.c-info{padding:10px 16px;}
+.c-label{font-size:9px;color:var(--comment);letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px;}
+.c-val{font-size:12px;}
+.contact-form{display:flex;flex-direction:column;gap:12px;}
+.f-group{display:flex;flex-direction:column;gap:4px;}
+.f-label{font-size:10px;color:var(--comment);letter-spacing:.1em;text-transform:uppercase;}
+.f-input,.f-ta{background:var(--bg2);border:1px solid var(--line);color:var(--text);padding:9px 12px;font-family:var(--mono);font-size:12px;outline:none;transition:border-color .2s;}
+.f-input:focus,.f-ta:focus{border-color:var(--green);}
+.f-ta{min-height:110px;resize:vertical;}
+.f-submit{background:var(--bg3);border:1px solid var(--green);color:var(--green);padding:10px;font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .2s,color .2s;}
+.f-submit:hover{background:var(--green);color:var(--bg0);}
+.f-ok{display:none;font-size:12px;color:var(--green);padding:12px;border:1px solid var(--green-dim);text-align:center;}
+
+/* STATUS BAR */
+.statusbar{position:sticky;bottom:0;background:var(--green);color:var(--bg0);font-size:11px;display:flex;align-items:center;gap:0;height:22px;z-index:90;}
+.sb-item{padding:0 12px;height:100%;display:flex;align-items:center;gap:6px;border-right:1px solid rgba(0,0,0,.15);font-weight:500;}
+.sb-item.right{margin-left:auto;border-right:none;border-left:1px solid rgba(0,0,0,.15);}
+.sb-sep{color:rgba(0,0,0,.3);}
+
+/* FOOTER */
+footer{background:var(--bg1);border-top:1px solid var(--line);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--muted);}
+footer .co span{color:var(--green);}
+footer .co2{color:var(--comment);}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.on{opacity:1;transform:none;}
+.reveal-r{opacity:0;transform:translateX(20px);transition:opacity .6s ease,transform .6s ease;}
+.reveal-r.on{opacity:1;transform:none;}
+
+/* MOBILE */
+.mob-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:200;background:var(--bg1);border-bottom:1px solid var(--line);padding:10px 16px;align-items:center;justify-content:space-between;}
+.mob-logo{font-size:13px;font-weight:700;color:var(--green);}
+.mob-ham{display:flex;flex-direction:column;gap:4px;cursor:pointer;background:none;border:none;}
+.mob-ham span{display:block;width:20px;height:2px;background:var(--text);transition:.3s;}
+.mob-ham.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.mob-ham.open span:nth-child(2){opacity:0;}
+.mob-ham.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+.mob-nav{display:none;position:fixed;top:41px;left:0;right:0;bottom:0;background:var(--bg0);z-index:190;flex-direction:column;padding:20px 16px;gap:4px;overflow-y:auto;}
+.mob-nav.open{display:flex;}
+.mob-nav a{display:block;padding:10px 12px;color:var(--mid);text-decoration:none;font-size:13px;border-left:2px solid transparent;transition:.15s;}
+.mob-nav a:hover{color:var(--bright);border-left-color:var(--green);background:var(--bg2);}
+
+@media(max-width:860px){
+  .sidebar{display:none;}.main{margin-left:0;}.mob-bar{display:flex;}
+  .topbar{display:none;}.content{padding-top:41px;}.code-header{top:41px;}
+  .contact-grid{grid-template-columns:1fr;}
+  .code-area{padding:20px 16px;}.line-nums{display:none;}
+  footer{flex-direction:column;gap:8px;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<div class="mob-bar">
+  <div class="mob-logo">vamshi.dev</div>
+  <button class="mob-ham" id="mobHam"><span></span><span></span><span></span></button>
+</div>
+<nav class="mob-nav" id="mobNav">
+  <a href="#home"         onclick="closeMob()">⌂  home.sh</a>
+  <a href="#about"        onclick="closeMob()">◎  about.py</a>
+  <a href="#skills"       onclick="closeMob()">◈  skills.json</a>
+  <a href="#education"    onclick="closeMob()">◉  education.md</a>
+  <a href="#hobbies"      onclick="closeMob()">◌  hobbies.txt</a>
+  <a href="#achievements" onclick="closeMob()">★  wins.log</a>
+  <a href="#projects"     onclick="closeMob()">⬡  projects/</a>
+  <a href="#contact"      onclick="closeMob()">✉  contact.ts</a>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-title">EXPLORER</div>
+      <div class="sidebar-sub">▸ vamshi-portfolio</div>
+    </div>
+    <div class="file-tree">
+      <div class="tree-folder"><em class="ico">▾</em> src</div>
+      <a href="#home"         class="file-item active" data-section="home">        <span class="dot"></span>home<span class="ext">.sh</span></a>
+      <a href="#about"        class="file-item"        data-section="about">       <span class="dot"></span>about<span class="ext">.py</span></a>
+      <a href="#skills"       class="file-item"        data-section="skills">      <span class="dot"></span>skills<span class="ext">.json</span></a>
+      <a href="#education"    class="file-item"        data-section="education">   <span class="dot"></span>education<span class="ext">.md</span></a>
+      <a href="#hobbies"      class="file-item"        data-section="hobbies">     <span class="dot"></span>hobbies<span class="ext">.txt</span></a>
+      <a href="#achievements" class="file-item"        data-section="achievements"><span class="dot"></span>wins<span class="ext">.log</span></a>
+      <a href="#projects"     class="file-item"        data-section="projects">    <span class="dot"></span>projects<span class="ext">/</span></a>
+      <a href="#contact"      class="file-item"        data-section="contact">     <span class="dot"></span>contact<span class="ext">.ts</span></a>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="git-status">
+        <span class="git-branch">⎇ main</span>
+        <span class="git-dot">✓</span>
+        <span>up to date</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <a href="#home"      class="tab active"><span class="tab-dot"></span> home.sh <span class="tab-lang">bash</span></a>
+      <a href="#about"     class="tab"> about.py <span class="tab-lang">python</span></a>
+      <a href="#skills"    class="tab"> skills.json <span class="tab-lang">json</span></a>
+      <a href="#education" class="tab"> education.md <span class="tab-lang">md</span></a>
+      <a href="#projects"  class="tab"> projects/ <span class="tab-lang">dir</span></a>
+      <a href="#contact"   class="tab"> contact.ts <span class="tab-lang">ts</span></a>
+    </div>
+
+    <div class="content">
+
+      <!-- HOME -->
+      <section id="home">
+        <div class="code-header"><span style="color:var(--comment)">~/vamshi-portfolio/src/</span><span class="fn">home.sh</span></div>
+        <div class="section-body">
+          <div class="line-nums">
+            <span class="ln">1</span><span class="ln">2</span><span class="ln">3</span><span class="ln">4</span><span class="ln">5</span>
+            <span class="ln">6</span><span class="ln">7</span><span class="ln">8</span><span class="ln">9</span><span class="ln">10</span>
+            <span class="ln">11</span><span class="ln">12</span><span class="ln">13</span><span class="ln">14</span><span class="ln">15</span>
+          </div>
+          <div class="code-area">
+            <div class="terminal-window reveal">
+              <div class="term-titlebar">
+                <div class="term-btn r"></div><div class="term-btn y"></div><div class="term-btn g"></div>
+                <span class="term-name">bash — vamshi@dev: ~</span>
+              </div>
+              <div class="term-body">
+                <div><span class="tc">vamshi</span><span class="to">@</span><span class="tb">dev</span><span class="to">:~$ </span><span style="color:var(--bright)">cat profile.json</span></div>
+                <div style="margin:8px 0;color:var(--line)">──────────────────────────────────</div>
+                <div><span class="to">{</span></div>
+                <div style="padding-left:16px"><span class="ty">"name"</span><span class="to">: </span><span class="tg">"Vamshi"</span><span class="to">,</span></div>
+                <div style="padding-left:16px"><span class="ty">"role"</span><span class="to">: </span><span class="tg">"<span id="typed-hero"></span><span class="tcur"></span>"</span><span class="to">,</span></div>
+                <div style="padding-left:16px"><span class="ty">"stack"</span><span class="to">: [</span><span class="tg">"Python"</span><span class="to">,</span> <span class="tg">"Flask"</span><span class="to">,</span> <span class="tg">"Django"</span><span class="to">,</span> <span class="tg">"ML"</span><span class="to">],</span></div>
+                <div style="padding-left:16px"><span class="ty">"cgpa"</span><span class="to">: </span><span class="tc">9.12</span><span class="to">,</span></div>
+                <div style="padding-left:16px"><span class="ty">"open_to_work"</span><span class="to">: </span><span class="tp">true</span></div>
+                <div><span class="to">}</span></div>
+                <div style="margin:8px 0;color:var(--line)">──────────────────────────────────</div>
+                <div><span class="tc">vamshi</span><span class="to">@</span><span class="tb">dev</span><span class="to">:~$ <span class="tcur"></span></span></div>
+              </div>
+            </div>
+
+            <div class="hero-tagline reveal">Hi, I'm <span class="hg">Vamshi</span> —<br>a <span class="hb">Full-Stack</span> Developer.</div>
+            <p class="hero-sub reveal">
+              <span class="cmt">// CS student · Python · Flask · Django · ML · OpenCV</span><br>
+              Building practical, feature-complete systems from scratch.
+            </p>
+            <div class="hero-btns reveal">
+              <a href="#projects" class="btn-c btn-p">$ ls projects/</a>
+              <a href="#contact"  class="btn-c btn-g">$ mail -s "hello"</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about">
+        <div class="code-header"><span style="color:var(--comment)">~/vamshi-portfolio/src/</span><span class="fn">about.py</span></div>
+        <div class="section-body">
+          <div class="line-nums" id="ln-about"></div>
+          <div class="code-area">
+            <div class="code-block reveal">
+              <div class="code-line"><span class="cmt"># about.py — developer profile</span></div>
+              <div class="code-line">&nbsp;</div>
+              <div class="code-line"><span class="kw">class </span><span class="fn">Developer</span><span class="op">:</span></div>
+              <div class="code-line i1"><span class="kw2">def </span><span class="fn">__init__</span><span class="op">(self):</span></div>
+              <div class="code-line i2"><span class="op">self.</span><span style="color:var(--text)">name     </span><span class="op">= </span><span class="str">"Vamshi"</span></div>
+              <div class="code-line i2"><span class="op">self.</span><span style="color:var(--text)">degree   </span><span class="op">= </span><span class="str">"BCA — Computer Science"</span></div>
+              <div class="code-line i2"><span class="op">self.</span><span style="color:var(--text)">cgpa     </span><span class="op">= </span><span class="num">9.12</span></div>
+              <div class="code-line i2"><span class="op">self.</span><span style="color:var(--text)">location </span><span class="op">= </span><span class="str">"India 🇮🇳"</span></div>
+              <div class="code-line i2"><span class="op">self.</span><span style="color:var(--text)">focus    </span><span class="op">= [</span></div>
+              <div class="code-line i3"><span class="str">"Full-Stack Development"</span><span class="op">,</span></div>
+              <div class="code-line i3"><span class="str">"Machine Learning"</span><span class="op">,</span></div>
+              <div class="code-line i3"><span class="str">"System Design"</span></div>
+              <div class="code-line i2"><span class="op">]</span></div>
+              <div class="code-line">&nbsp;</div>
+              <div class="code-line i1"><span class="kw2">def </span><span class="fn">summary</span><span class="op">(self) -> </span><span class="kw2">str</span><span class="op">:</span></div>
+              <div class="code-line i2"><span class="kw">return </span><span class="str2">"""</span></div>
+              <div class="code-line i3"><span class="str2">Motivated CS student with strong foundations in</span></div>
+              <div class="code-line i3"><span class="str2">Python, web development, and ML. Built 10+ apps —</span></div>
+              <div class="code-line i3"><span class="str2">from AI chatbots to face recognition systems.</span></div>
+              <div class="code-line i2"><span class="str2">"""</span></div>
+              <div class="code-line">&nbsp;</div>
+              <div class="code-line"><span class="cmt"># instantiate and run</span></div>
+              <div class="code-line"><span style="color:var(--text)">v </span><span class="op">= </span><span class="fn">Developer</span><span class="op">()</span></div>
+              <div class="code-line"><span class="fn">print</span><span class="op">(</span><span class="str">f"CGPA: {v.cgpa} | Projects: 10 | Awards: 5"</span><span class="op">)</span></div>
+              <div class="code-line"><span class="cmt"># → CGPA: 9.12 | Projects: 10 | Awards: 5</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SKILLS -->
+      <section id="skills">
+        <div class="code-header"><span style="color:var(--comment)">~/vamshi-portfolio/src/</span><span class="fn">skills.json</span></div>
+        <div class="section-body">
+          <div class="line-nums" id="ln-skills"></div>
+          <div class="code-area">
+            <div class="reveal" style="color:var(--comment);font-size:11px;margin-bottom:16px">// skills.json — tech stack &amp; proficiency</div>
+            <table class="skills-table reveal">
+              <thead>
+                <tr style="border-bottom:1px solid var(--line)">
+                  <td class="td-num" style="color:var(--comment);font-size:10px;padding-bottom:10px">#</td>
+                  <td style="padding:8px 16px;font-size:10px;color:var(--comment);text-transform:uppercase;letter-spacing:.1em">skill</td>
+                  <td style="padding:8px 16px;font-size:10px;color:var(--comment);text-transform:uppercase;letter-spacing:.1em">category</td>
+                  <td style="padding:8px 16px;font-size:10px;color:var(--comment);text-transform:uppercase;letter-spacing:.1em">proficiency</td>
+                </tr>
+              </thead>
+              <tbody id="skills-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- EDUCATION -->
+      <section id="education">
+        <div class="code-header"><span style="color:var(--comment)">~/vamshi-portfolio/src/</span><span class="fn">education.md</span></div>
+        <div class="section-body">
+          <div class="line-nums" id="ln-edu"></div>
+          <div class="code-area">
+            <div class="reveal" style="color:var(--comment);font-size:11px;margin-bottom:20px">## education.md — academic history</div>
+            <div class="edu-cards reveal">
+              <div class="edu-card" data-num="01">
+                <div class="edu-tag">CURRENT</div>
+                <div class="edu-deg">Bachelor of Computer Applications (BCA)</div>
+                <div class="edu-score">⚡ CGPA: 9.12 / 10.0</div>
+                <div class="edu-desc">Core concepts of Programming, Web Dev, Databases, and Software Development with hands-on project experience in ML and full-stack systems.</div>
+              </div>
+              <div class="edu-card" data-num="02">
+                <div class="edu-deg">Pre-University Course — Commerce (PUC)</div>
+                <div class="edu-score">⚡ 91.5%</div>
+                <div class="edu-desc">Accountancy, Business Studies, Economics — built strong analytical foundations in finance and quantitative reasoning.</div>
+              </div>
+              <div class="edu-card" data-num="03">
+                <div class="edu-deg">Secondary School Leaving Certificate (SSLC)</div>
+                <div class="edu-score">⚡ 93.12%</div>
+                <div class="edu-desc">Mathematics, Science, Social Studies — top performer developing logical and problem-solving skills from early on.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HOBBIES -->
+      <section id="hobbies">
+        <div class="code-header"><span style="color:var(--comment)">~/vamshi-portfolio/src/</span><span class="fn">hobbies.txt</span></div>
+        <div class="section-body">
+          <div class="line-nums" id="ln-hobbies"></div>
+          <div class="code-area">
+            <div class="reveal" style="color:var(--comment);font-size:11px;margin-bottom:20px">// life beyond the terminal</div>
+            <div class="hobby-grid reveal">
+              <div class="hobby-tile">
+                <div class="hobby-num">01 // writing</div>
+                <div class="hobby-ico">✍️</div>
+                <div class="hobby-t">Writing Stories</div>
+                <div class="hobby-d">Creating fantasy, emotional and imaginative stories. Storytelling sharpens my ability to design coherent systems and user flows.</div>
+              </div>
+              <div class="hobby-tile">
+                <div class="hobby-num">02 // music</div>
+                <div class="hobby-ico">🎧</div>
+                <div class="hobby-t">Listening to Music</div>
+                <div class="hobby-d">Music is my background process. Keeps me focused, reduces debug fatigue, keeps the creative loop alive during long sessions.</div>
+              </div>
+              <div class="hobby-tile">
+                <div class="hobby-num">03 // chess</div>
+                <div class="hobby-ico">♟️</div>
+                <div class="hobby-t">Playing Chess</div>
+                <div class="hobby-d">Chess trains the exact skills coding demands — strategic thinking, pattern recognition, and staying calm under pressure.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACHIEVEMENTS -->
+      <section id="achievements">
+        <div class="code-header"><span style="color:var(--comment)">~/vamshi-portfolio/src/</span><span class="fn">wins.log</span></div>
+        <div class="section-body">
+          <div class="line-nums" id="ln-ach"></div>
+          <div class="code-area">
+            <div class="reveal" style="color:var(--comment);font-size:11px;margin-bottom:20px">$ cat wins.log | grep --color=always "FIRST\|CERT"</div>
+            <div class="ach-list reveal">
+              <div class="ach-item">
+                <div class="ach-idx">01</div>
+                <div class="ach-body">
+                  <div class="ach-label">COMPETITION — 1ST PLACE</div>
+                  <div class="ach-name">Login 2k25 — Debugging Contest</div>
+                  <div class="ach-meta">Found and fixed bugs faster than all. Ranked #1.</div>
+                </div>
+                <div class="ach-badge">🥇</div>
+              </div>
+              <div class="ach-item">
+                <div class="ach-idx">02</div>
+                <div class="ach-body">
+                  <div class="ach-label">COMPETITION — 1ST PLACE</div>
+                  <div class="ach-name">Login 2k25 — Reverse Coding</div>
+                  <div class="ach-meta">Decoded program output back to source. First to solve.</div>
+                </div>
+                <div class="ach-badge">🥇</div>
+              </div>
+              <div class="ach-item">
+                <div class="ach-idx">03</div>
+                <div class="ach-body">
+                  <div class="ach-label">CERTIFICATE</div>
+                  <div class="ach-name">Code C Program — Participation Certificate</div>
+                  <div class="ach-meta">Competitive C programming event participation.</div>
+                </div>
+                <div class="ach-badge">📜</div>
+              </div>
+              <div class="ach-item">
+                <div class="ach-idx">04</div>
+                <div class="ach-body">
+                  <div class="ach-label">MEMBERSHIP</div>
+                  <div class="ach-name">English Literature Club — Member Certificate</div>
+                  <div class="ach-meta">Active contributor to creative writing events.</div>
+                </div>
+                <div class="ach-badge">📚</div>
+              </div>
+              <div class="ach-item">
+                <div class="ach-idx">05</div>
+                <div class="ach-body">
+                  <div class="ach-label">INDUSTRY TRAINING</div>
+                  <div class="ach-name">Infosys — Workshop Certificate</div>
+                  <div class="ach-meta">Industry exposure and technical training from Infosys.</div>
+                </div>
+                <div class="ach-badge">🏢</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section id="projects">
+        <div class="code-header"><span style="color:var(--comment)">~/vamshi-portfolio/src/</span><span class="fn">projects/</span></div>
+        <div class="section-body">
+          <div class="line-nums" id="ln-proj"></div>
+          <div class="code-area">
+            <div class="reveal" style="color:var(--comment);font-size:11px;margin-bottom:20px">$ ls -la projects/ | sort -k5 -rh</div>
+            <div class="proj-grid">
+              <div class="proj-card reveal"><div class="proj-bar"></div><div class="proj-inner">
+                <div class="proj-file"><span class="proj-file-ico">📄</span> wine_predictor.py</div>
+                <div class="proj-name">Wine Quality Predictor</div>
+                <p class="proj-desc">Random Forest ML model with class imbalance handling. 10 Plotly visualizations in Flask admin dashboard on real CSV data.</p>
+                <div class="proj-tags"><span class="ptag py">Flask</span><span class="ptag ml">sklearn</span><span class="ptag py">Plotly</span><span class="ptag ml">ML</span></div>
+              </div></div>
+
+              <div class="proj-card reveal"><div class="proj-bar"></div><div class="proj-inner">
+                <div class="proj-file"><span class="proj-file-ico">📄</span> facetrack_pro.py</div>
+                <div class="proj-name">FaceTrack Pro</div>
+                <p class="proj-desc">Face recognition attendance with dlib + OpenCV. Live webcam scanner, 8 modules, leave management, CSV export.</p>
+                <div class="proj-tags"><span class="ptag py">Flask</span><span class="ptag ml">OpenCV</span><span class="ptag ml">dlib</span></div>
+              </div></div>
+
+              <div class="proj-card reveal"><div class="proj-bar"></div><div class="proj-inner">
+                <div class="proj-file"><span class="proj-file-ico">📄</span> schoolpro/views.py</div>
+                <div class="proj-name">SchoolPro</div>
+                <p class="proj-desc">Django school management with student/teacher portals, Chart.js dashboards, CSV export, library + fee + timetable.</p>
+                <div class="proj-tags"><span class="ptag dj">Django</span><span class="ptag js">Chart.js</span><span class="ptag cs">Bootstrap</span></div>
+              </div></div>
+
+              <div class="proj-card reveal"><div class="proj-bar"></div><div class="proj-inner">
+                <div class="proj-file"><span class="proj-file-ico">📄</span> emotisense.py</div>
+                <div class="proj-name">EmotiSense</div>
+                <p class="proj-desc">Real-time facial emotion recognition with MediaPipe + Haar Cascades. Mood journal, wellness goals, single-canvas webcam.</p>
+                <div class="proj-tags"><span class="ptag py">Flask</span><span class="ptag ml">MediaPipe</span><span class="ptag ml">OpenCV</span></div>
+              </div></div>
+
+              <div class="proj-card reveal"><div class="proj-bar"></div><div class="proj-inner">
+                <div class="proj-file"><span class="proj-file-ico">📄</span> nexusai/app.py</div>
+                <div class="proj-name">NexusAI Chatbot</div>
+                <p class="proj-desc">OpenRouter-powered chatbot with 9 AI model options, Flask-Login + Bcrypt auth, 3 blueprints, markdown rendering.</p>
+                <div class="proj-tags"><span class="ptag py">Flask</span><span class="ptag ml">OpenRouter</span><span class="ptag ml">LLM</span></div>
+              </div></div>
+
+              <div class="proj-card reveal"><div class="proj-bar"></div><div class="proj-inner">
+                <div class="proj-file"><span class="proj-file-ico">📄</span> kiba_bot.py</div>
+                <div class="proj-name">Kiba Chatbot</div>
+                <p class="proj-desc">Rule-based AI with scoring brain engine, 16 modules — Indian epics, cricket, cinema, science, puzzles. 94/94 tests passing.</p>
+                <div class="proj-tags"><span class="ptag py">Flask</span><span class="ptag ml">NLP</span><span class="ptag py">Python</span></div>
+              </div></div>
+
+              <div class="proj-card reveal"><div class="proj-bar"></div><div class="proj-inner">
+                <div class="proj-file"><span class="proj-file-ico">📄</span> tictactoe.html</div>
+                <div class="proj-name">Tic Tac Toe</div>
+                <p class="proj-desc">Classic two-player game with win detection, draw logic, and clean vanilla UI.</p>
+                <div class="proj-tags"><span class="ptag js">HTML</span><span class="ptag cs">CSS</span><span class="ptag js">JS</span></div>
+              </div></div>
+
+              <div class="proj-card reveal"><div class="proj-bar"></div><div class="proj-inner">
+                <div class="proj-file"><span class="proj-file-ico">📄</span> typing_test.html</div>
+                <div class="proj-name">Typing Speed Test</div>
+                <p class="proj-desc">Interactive WPM test with real-time accuracy tracking, timer, and improvement history.</p>
+                <div class="proj-tags"><span class="ptag js">HTML</span><span class="ptag cs">CSS</span><span class="ptag js">JS</span></div>
+              </div></div>
+
+              <div class="proj-card reveal"><div class="proj-bar"></div><div class="proj-inner">
+                <div class="proj-file"><span class="proj-file-ico">📄</span> calculator.html</div>
+                <div class="proj-name">Calculator</div>
+                <p class="proj-desc">Fully functional browser calculator with all arithmetic ops, keyboard input, clean minimal design.</p>
+                <div class="proj-tags"><span class="ptag js">HTML</span><span class="ptag cs">CSS</span><span class="ptag js">JS</span></div>
+              </div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact">
+        <div class="code-header"><span style="color:var(--comment)">~/vamshi-portfolio/src/</span><span class="fn">contact.ts</span></div>
+        <div class="section-body">
+          <div class="line-nums" id="ln-contact"></div>
+          <div class="code-area">
+            <div class="reveal" style="color:var(--comment);font-size:11px;margin-bottom:24px">// contact.ts — let's build something together</div>
+            <div class="contact-grid">
+              <div class="contact-links reveal">
+                <a href="tel:+919035124146" class="c-link">
+                  <div class="c-ico">📞</div>
+                  <div class="c-info"><div class="c-label">phone</div><div class="c-val">+91 9035124146</div></div>
+                </a>
+                <a href="mailto:vamshian785@email.com" class="c-link">
+                  <div class="c-ico">📧</div>
+                  <div class="c-info"><div class="c-label">email</div><div class="c-val">vamshian785@email.com</div></div>
+                </a>
+                <a href="https://github.com/vamshian" target="_blank" class="c-link">
+                  <div class="c-ico">🐙</div>
+                  <div class="c-info"><div class="c-label">github</div><div class="c-val">github.com/vamshian</div></div>
+                </a>
+                <a href="https://linkedin.com/in/yourusername" target="_blank" class="c-link">
+                  <div class="c-ico">💼</div>
+                  <div class="c-info"><div class="c-label">linkedin</div><div class="c-val">linkedin.com/in/vamshi</div></div>
+                </a>
+              </div>
+              <div class="reveal-r">
+                <div class="contact-form" id="cForm">
+                  <div class="f-group"><label class="f-label">// name</label><input class="f-input" id="cname" placeholder="your_name"/></div>
+                  <div class="f-group"><label class="f-label">// email</label><input class="f-input" id="cemail" placeholder="you@example.com"/></div>
+                  <div class="f-group"><label class="f-label">// message</label><textarea class="f-ta" id="cmsg" placeholder="Hey Vamshi, let's collaborate on..."></textarea></div>
+                  <button class="f-submit" onclick="sendMsg()">$ send message →</button>
+                </div>
+                <div class="f-ok" id="fOk">✓ message queued — I'll reply soon.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="statusbar">
+      <div class="sb-item">⎇ main</div>
+      <div class="sb-item">✓ 0 errors</div>
+      <div class="sb-item">Python · Flask · Django · ML</div>
+      <div class="sb-item right">Ln <span id="sb-ln">1</span>, Col 1 <span class="sb-sep">|</span> UTF-8 <span class="sb-sep">|</span> vamshi.dev</div>
+    </div>
+
+    <footer>
+      <div class="co">© 2026 <span>vamshi</span>.dev — all rights reserved</div>
+      <div class="co2">// crafted with Python + coffee + 0 sleep</div>
+    </footer>
+  </div>
+</div>
+
+<script>
+// SKILLS DATA
+const skills=[
+  {name:'Python',     type:'language',  pct:92},
+  {name:'Flask',      type:'framework', pct:88},
+  {name:'Django',     type:'framework', pct:82},
+  {name:'HTML/CSS',   type:'frontend',  pct:90},
+  {name:'JavaScript', type:'frontend',  pct:75},
+  {name:'SQL/SQLite', type:'database',  pct:80},
+  {name:'scikit-learn',type:'ml',       pct:78},
+  {name:'OpenCV',     type:'vision',    pct:74},
+  {name:'MediaPipe',  type:'vision',    pct:70},
+  {name:'Git/GitHub', type:'tooling',   pct:85},
+  {name:'Plotly',     type:'dataviz',   pct:80},
+  {name:'Bootstrap',  type:'frontend',  pct:86},
+];
+const tbody=document.getElementById('skills-tbody');
+skills.forEach((s,i)=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td class="td-num">${String(i+1).padStart(2,'0')}</td>
+    <td class="td-name">"${s.name}"</td>
+    <td class="td-type">${s.type}</td>
+    <td><div class="level-bar"><div class="bar-track"><div class="bar-fill" data-pct="${s.pct}"></div></div><span class="bar-pct">${s.pct}%</span></div></td>`;
+  tbody.appendChild(tr);
+});
+
+// LINE NUMBERS
+function fillLn(id,n){
+  const el=document.getElementById(id);if(!el)return;
+  for(let i=1;i<=n;i++){const s=document.createElement('span');s.className='ln';s.textContent=i;el.appendChild(s);}
+}
+fillLn('ln-about',30);fillLn('ln-skills',20);fillLn('ln-edu',25);
+fillLn('ln-hobbies',22);fillLn('ln-ach',28);fillLn('ln-proj',60);fillLn('ln-contact',30);
+
+// TYPING
+const words=['Full-Stack Developer','ML Engineer','Cyber Coder','Problem Solver','BCA Student'];
+let wi=0,ci=0,del=false;
+const te=document.getElementById('typed-hero');
+function typeH(){
+  const w=words[wi];
+  if(del)te.textContent=w.slice(0,--ci);
+  else   te.textContent=w.slice(0,++ci);
+  if(!del&&ci===w.length)setTimeout(()=>del=true,1600);
+  else if(del&&ci===0){del=false;wi=(wi+1)%words.length;}
+  setTimeout(typeH,del?55:95);
+}
+typeH();
+
+// SCROLL REVEAL
+const revs=document.querySelectorAll('.reveal,.reveal-r');
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on');});},{threshold:0.1});
+revs.forEach(r=>io.observe(r));
+
+// BAR ANIMATION
+const barIO=new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting){const f=e.target.querySelector('.bar-fill');if(f)f.style.width=f.dataset.pct+'%';}});
+},{threshold:0.3});
+document.querySelectorAll('.skills-table tr').forEach(r=>barIO.observe(r));
+
+// SCROLLSPY
+const sections=['home','about','skills','education','hobbies','achievements','projects','contact'];
+const fileItems=document.querySelectorAll('.file-item');
+const tabs=document.querySelectorAll('.tab');
+const sbLn=document.getElementById('sb-ln');
+
+window.addEventListener('scroll',()=>{
+  if(sbLn)sbLn.textContent=Math.floor(window.scrollY/20);
+  let cur='home';
+  sections.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-200)cur=id;});
+  fileItems.forEach(f=>{
+    const a=f.dataset.section===cur;
+    f.classList.toggle('active',a);
+    const d=f.querySelector('.dot');
+    if(d){d.style.background=a?'var(--green)':'var(--comment)';d.style.boxShadow=a?'0 0 6px var(--green)':'none';}
+  });
+  tabs.forEach(t=>t.classList.toggle('active',t.getAttribute('href')?.replace('#','')==cur));
+});
+
+// MOBILE
+const mh=document.getElementById('mobHam'),mn=document.getElementById('mobNav');
+mh.addEventListener('click',()=>{mh.classList.toggle('open');mn.classList.toggle('open');});
+function closeMob(){mh.classList.remove('open');mn.classList.remove('open');}
+
+// FORM
+function sendMsg(){
+  if(!document.getElementById('cname').value.trim()||!document.getElementById('cemail').value.trim()||!document.getElementById('cmsg').value.trim()){alert('// error: all fields required');return;}
+  document.getElementById('cForm').style.display='none';
+  document.getElementById('fOk').style.display='block';
+}
+</script>
+</body>
+</html>
